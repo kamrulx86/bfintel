@@ -31,7 +31,7 @@ export default function AuthLayout({
             ))}
           </ul>
         </div>
-        <p className="text-xs text-muted font-mono">TTP · Team Phoenix</p>
+        <p className="text-xs text-muted font-mono">TTP · The Team Phoenix</p>
       </aside>
 
       <main className="flex-1 flex items-center justify-center p-6 sm:p-10">

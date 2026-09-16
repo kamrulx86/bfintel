@@ -69,4 +69,4 @@ Open **http://localhost:8080** — complete setup wizard.
 
 ## License
 
-This project is licensed under the [MIT License](LICENSE) — Copyright (c) 2026 Team Phoenix.
+This project is licensed under the [MIT License](LICENSE) — Copyright (c) 2026 The Team Phoenix.

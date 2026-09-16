@@ -21,7 +21,7 @@ export default function SetupWizard({
   const [error, setError] = useState<string | null>(null);
   const [testResult, setTestResult] = useState<TestResult | null>(null);
   const [admin, setAdmin] = useState({
-    organization_name: "Team Phoenix",
+    organization_name: "The Team Phoenix",
     full_name: "",
     email: "",
     password: "",
