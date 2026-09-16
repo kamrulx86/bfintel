@@ -1,5 +1,7 @@
 # BFIntel
 
+[![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
+
 Enterprise brute-force intelligence layer for **Wazuh** — investigation, correlation, enrichment, and response (not a Wazuh replacement).
 
 ![BFIntel security overview](docs/screenshots/02-overview.png)
@@ -67,4 +69,4 @@ Open **http://localhost:8080** — complete setup wizard.
 
 ## License
 
-Proprietary — Team Phoenix (configure before public GitHub).
+This project is licensed under the [MIT License](LICENSE) — Copyright (c) 2026 Team Phoenix.
