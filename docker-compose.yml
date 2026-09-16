@@ -1,0 +1,100 @@
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ${POSTGRES_USER:-bfintel}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-bfintel_dev}
+      POSTGRES_DB: ${POSTGRES_DB:-bfintel}
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER:-bfintel}"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  redis:
+    image: redis:7-alpine
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+  backend:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-bfintel}:${POSTGRES_PASSWORD:-bfintel_dev}@postgres:5432/${POSTGRES_DB:-bfintel}
+      REDIS_URL: redis://redis:6379/0
+      WAZUH_ALERTS_JSON_PATH: ${WAZUH_ALERTS_JSON_PATH:-/wazuh-alerts/alerts.json}
+    volumes:
+      - ${WAZUH_ALERTS_HOST_DIR:-/var/ossec/logs/alerts}:/wazuh-alerts:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    ports:
+      - "8000:8000"
+    command: >
+      sh -c "alembic upgrade head &&
+             uvicorn app.main:app --host 0.0.0.0 --port 8000"
+
+  worker:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-bfintel}:${POSTGRES_PASSWORD:-bfintel_dev}@postgres:5432/${POSTGRES_DB:-bfintel}
+      REDIS_URL: redis://redis:6379/0
+      WAZUH_ALERTS_JSON_PATH: ${WAZUH_ALERTS_JSON_PATH:-/wazuh-alerts/alerts.json}
+    volumes:
+      - ${WAZUH_ALERTS_HOST_DIR:-/var/ossec/logs/alerts}:/wazuh-alerts:ro
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: celery -A app.workers.celery_app worker -l info
+
+  beat:
+    build:
+      context: ./backend
+      dockerfile: Dockerfile
+    env_file: .env
+    environment:
+      DATABASE_URL: postgresql+psycopg://${POSTGRES_USER:-bfintel}:${POSTGRES_PASSWORD:-bfintel_dev}@postgres:5432/${POSTGRES_DB:-bfintel}
+      REDIS_URL: redis://redis:6379/0
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+    command: celery -A app.workers.celery_app beat -l info
+
+  frontend:
+    build:
+      context: ./frontend
+      dockerfile: Dockerfile
+      args:
+        # Docker/nginx: always same-origin /api (ignore .env localhost URLs)
+        VITE_API_BASE_URL: ""
+    ports:
+      - "5173:80"
+
+  nginx:
+    image: nginx:1.27-alpine
+    volumes:
+      - ./infrastructure/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - "${BFINTEL_HTTP_PORT:-8080}:80"
+    depends_on:
+      - backend
+      - frontend
+
+volumes:
+  pgdata:
