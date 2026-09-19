@@ -20,6 +20,7 @@ from app.schemas.setup import (
     WazuhTestResponse,
 )
 from app.services.audit import write_audit
+from app.services.ingest_alerts import ingest_initial_wazuh_logs
 
 router = APIRouter(prefix="/setup", tags=["setup"])
 
@@ -128,6 +129,14 @@ async def save_wazuh(
         last_health_status="connected",
     )
     db.add(conn)
+    db.flush()
+
+    initial_ingest: dict | None = None
+    try:
+        initial_ingest = ingest_initial_wazuh_logs(db, user.organization_id)
+    except OSError as exc:
+        initial_ingest = {"error": "ingest_failed", "detail": str(exc)[:500]}
+
     write_audit(
         db,
         action="wazuh.connection_created",
@@ -135,7 +144,12 @@ async def save_wazuh(
         organization_id=user.organization_id,
         target=body.api_url,
         ip_address=request.client.host if request.client else None,
-        metadata={"verify_tls": body.verify_tls},
+        metadata={"verify_tls": body.verify_tls, "initial_ingest": initial_ingest},
     )
     db.commit()
-    return WazuhSaveResponse(id=str(conn.id), message="Wazuh connection saved")
+
+    return WazuhSaveResponse(
+        id=str(conn.id),
+        message="Wazuh connection saved",
+        initial_ingest=initial_ingest,
+    )

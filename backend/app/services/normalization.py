@@ -7,8 +7,9 @@ AUTH_FAIL_GROUPS = {
     "authentication_failures",
     "invalid_login",
     "win_authentication_failed",
+    "login_failed",
 }
-AUTH_SUCCESS_GROUPS = {"authentication_success", "authentication_successful"}
+AUTH_SUCCESS_GROUPS = {"authentication_success", "authentication_successful", "login"}
 SERVICE_HINTS = {
     "sshd": "ssh",
     "ssh": "ssh",
@@ -57,7 +58,7 @@ def is_auth_related(groups: list[str], rule_id: str) -> bool:
     gset = {g.lower() for g in groups}
     if gset & AUTH_FAIL_GROUPS or gset & AUTH_SUCCESS_GROUPS:
         return True
-    if rule_id in {"5710", "5712", "5716", "5720", "5760", "5551"}:
+    if rule_id in {"5710", "5712", "5716", "5720", "5760", "5551", "110002", "110003"}:
         return True
     return any("authentication" in g for g in gset)
 
@@ -77,9 +78,9 @@ def normalize_wazuh_alert(alert: dict[str, Any]) -> Optional[dict[str, Any]]:
     decoder = (alert.get("decoder") or {}).get("name") or ""
 
     gset = {g.lower() for g in groups}
-    if gset & AUTH_SUCCESS_GROUPS or rule_id in {"5501", "5503"}:
+    if gset & AUTH_SUCCESS_GROUPS or rule_id in {"5501", "5503", "110002"}:
         auth_result = "success"
-    elif gset & AUTH_FAIL_GROUPS or rule_id in {"5710", "5712", "5720", "5760"}:
+    elif gset & AUTH_FAIL_GROUPS or rule_id in {"5710", "5712", "5720", "5760", "110003"}:
         auth_result = "failure"
     else:
         auth_result = "unknown"

@@ -9,7 +9,7 @@ from playwright.sync_api import sync_playwright
 
 ROOT = Path(__file__).resolve().parents[1]
 OUT = ROOT / "docs" / "screenshots"
-BASE = os.environ.get("BFINTEL_URL", "http://192.168.122.186:8888").rstrip("/")
+BASE = os.environ.get("BFINTEL_URL", "http://127.0.0.1:8080").rstrip("/")
 EMAIL = os.environ.get("BFINTEL_EMAIL", "")
 PASSWORD = os.environ.get("BFINTEL_PASSWORD", "")
 

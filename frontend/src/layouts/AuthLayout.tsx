@@ -13,7 +13,7 @@ export default function AuthLayout({
 }) {
   return (
     <div className="min-h-screen flex flex-col lg:flex-row">
-      <aside className="hidden lg:flex lg:w-[42%] xl:w-[44%] flex-col justify-between p-10 border-r border-[var(--border)] bg-surface/40">
+      <aside className="hidden lg:flex lg:w-[42%] xl:w-[44%] flex-col justify-between p-10 border-r border-[var(--border)] bg-gradient-to-br from-surface/80 via-bg to-surface2/40">
         <Brand />
         <div className="space-y-6 max-w-md">
           <h1 className="text-3xl font-semibold tracking-tight leading-tight">
@@ -39,7 +39,7 @@ export default function AuthLayout({
           <div className="lg:hidden mb-8">
             <Brand />
           </div>
-          <div className="panel p-8 sm:p-9">
+          <div className="panel-glow p-8 sm:p-9">
             <p className="text-xs uppercase tracking-widest text-primary font-medium mb-2">Secure access</p>
             <h2 className="text-2xl font-semibold tracking-tight">{title}</h2>
             {subtitle && <p className="text-muted text-sm mt-2 mb-6">{subtitle}</p>}

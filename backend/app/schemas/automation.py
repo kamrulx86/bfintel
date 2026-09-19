@@ -24,6 +24,25 @@ class ChannelOut(BaseModel):
     model_config = {"from_attributes": True}
 
 
+class RuleTemplateOut(BaseModel):
+    id: str
+    name: str
+    description: str
+    category: str
+    severity: str
+    cooldown_minutes: int
+    conditions_summary: str
+    conditions: dict
+    note: str | None = None
+
+
+class RuleFromTemplateCreate(BaseModel):
+    template_id: str = Field(min_length=1, max_length=64)
+    channel_id: UUID | None = None
+    name_override: str | None = Field(default=None, max_length=128)
+    enabled: bool = True
+
+
 class RuleCreate(BaseModel):
     name: str = Field(min_length=1, max_length=128)
     enabled: bool = True

@@ -1,5 +1,6 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import PageHeader from "../components/PageHeader";
 import { api } from "../lib/api";
 
 export default function NotificationsPage() {
@@ -33,10 +34,7 @@ export default function NotificationsPage() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Notifications</h1>
-        <p className="text-muted text-sm mt-1">Telegram, Slack, and generic webhooks. Secrets are encrypted at rest.</p>
-      </div>
+      <PageHeader title="Notifications" description="Telegram, Slack, and generic webhooks. Secrets are encrypted at rest." />
 
       <div className="panel p-5 space-y-4 max-w-lg">
         <h2 className="text-sm font-semibold">Add channel</h2>

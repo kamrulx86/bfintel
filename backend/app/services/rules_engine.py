@@ -31,6 +31,7 @@ def _session_context(db: Session, org_id: UUID, session: AttackSession) -> dict:
         "risk_score": session.risk_score,
         "risk_level": session.risk_level,
         "attempt_count": session.attempt_count,
+        "successful_attempt_count": session.successful_attempt_count,
         "status": session.status,
         "attack_type": session.attack_type,
         "service": (session.services or [""])[0] if session.services else "",

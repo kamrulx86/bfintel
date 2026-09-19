@@ -8,16 +8,35 @@ cp .env.example .env
 docker compose up -d --build
 ```
 
-- UI: http://localhost:8080
-- API: http://localhost:8000/api/docs
+- UI: http://localhost:8080 (or `BFINTEL_HTTP_PORT` from `.env`)
+- API: http://localhost:8000/api/health
 
-## Dev server (192.168.122.186)
+## Remote / lab host
 
-- **BFIntel UI:** http://192.168.122.186:8888
-- **Wazuh API (setup wizard):** `https://192.168.122.186:55000` — use your `wazuh-wui` API user (from Wazuh dashboard config), **verify TLS off** for default certs.
-- Indexer from Docker may require `https://192.168.122.186:9200` or host-specific URL; test via **[Test Connection]** in wizard.
+1. Clone the repo on the target server (e.g. `~/bfintel`).
+2. Configure `.env` (never commit it).
+3. On a **co-located Wazuh manager**, mount alerts for ingest:
 
-Indexer on same host is often `https://127.0.0.1:9200` from Wazuh host only — from Docker use host gateway or expose indexer carefully.
+   `WAZUH_ALERTS_HOST_DIR=/var/ossec/logs/alerts`
+
+4. Run `docker compose up -d --build`.
+5. Complete the setup wizard (admin + Wazuh API URL, typically `https://<manager>:55000`, TLS verify off for default certs).
+
+On first Wazuh connection, BFIntel **backfills** `alerts.json` and enriches source IPs so the dashboard is populated immediately.
+
+If BFIntel runs in Docker on the same host as Wazuh, allow the compose bridge subnet to reach **55000** and **9200** on the host firewall (bridge CIDR varies; check `docker network inspect`).
+
+### Sync from your workstation
+
+```bash
+export LAB_HOST=your.server.example
+export LAB_USER=deploy
+export SSH_PORT=22
+export DEPLOY_COMPOSE=1
+./scripts/deploy-lab.sh
+```
+
+Store admin credentials only in a local gitignored file (see `lab-setup.credentials.example`).
 
 ## Production checklist
 
@@ -32,6 +51,6 @@ Indexer on same host is often `https://127.0.0.1:9200` from Wazuh host only — 
 
 ## GitHub
 
-Push `WEB-EDGE` repo; clone on any VPS; configure `.env`; `docker compose up -d --build`.
+Clone on any VPS; configure `.env`; `docker compose up -d --build`.
 
 CI runs `ruff` + `pytest` + frontend build on push (`.github/workflows/ci.yml`).

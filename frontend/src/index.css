@@ -4,44 +4,140 @@
 
 :root {
   color-scheme: dark;
-  --bg: #0b0f14;
-  --surface: #11161d;
-  --surface-2: #171d25;
-  --surface-3: #1e2630;
-  --border: #252f3d;
-  --text: #e6eaf0;
-  --muted: #8993a3;
+  --bg: #0a0d12;
+  --surface: #11151c;
+  --surface-2: #161c26;
+  --surface-3: #1c2430;
+  --border: #2a3342;
+  --text: #e8ecf2;
+  --muted: #8a939f;
   --primary: #5b7cfa;
-  --primary-dim: #3d56c7;
-  --success: #3d9a6a;
-  --warning: #d4a017;
-  --critical: #c44c4c;
+  --primary-dim: #4563d9;
+  --success: #3ecf8e;
+  --warning: #e6a23c;
+  --critical: #f07178;
 }
 
 @layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+  }
+
   body {
-    @apply antialiased bg-bg text-text;
-    background-image:
-      radial-gradient(ellipse 80% 50% at 50% -20%, rgba(91, 124, 250, 0.12), transparent),
-      radial-gradient(ellipse 60% 40% at 100% 0%, rgba(61, 154, 106, 0.06), transparent);
-    background-attachment: fixed;
+    @apply antialiased bg-bg text-text text-[15px] leading-relaxed;
+    background-color: var(--bg);
+  }
+
+  ::selection {
+    background: rgba(91, 124, 250, 0.3);
   }
 }
 
 @layer components {
+  .page-stack {
+    @apply flex flex-col gap-6;
+  }
+
+  .page-header {
+    @apply flex flex-col gap-4 sm:flex-row sm:items-start sm:justify-between border-b border-[var(--border)] pb-5;
+  }
+
   .panel {
-    @apply bg-surface/90 backdrop-blur-sm border border-[var(--border)] rounded-xl shadow-[0_8px_30px_rgba(0,0,0,0.35)];
+    @apply bg-surface border border-[var(--border)] rounded-xl;
   }
+
+  .panel-glow {
+    @apply panel;
+  }
+
+  .stat-card {
+    @apply panel p-4 sm:p-5;
+  }
+
   .input-field {
-    @apply w-full bg-bg/80 border border-[var(--border)] rounded-lg px-3.5 py-2.5 text-sm text-text
-      placeholder:text-muted/70 focus:outline-none focus:ring-2 focus:ring-primary/40 focus:border-primary/50 transition;
+    @apply w-full min-w-0 bg-bg border border-[var(--border)] rounded-lg px-3 py-2.5 text-sm text-text
+      placeholder:text-muted/70 focus:outline-none focus:ring-2 focus:ring-primary/30 focus:border-primary/40 transition;
   }
+
   .btn-primary {
     @apply inline-flex items-center justify-center gap-2 rounded-lg bg-primary hover:bg-primary-dim
       text-white font-medium px-4 py-2.5 text-sm transition disabled:opacity-50 disabled:pointer-events-none;
   }
+
   .btn-ghost {
     @apply inline-flex items-center justify-center gap-2 rounded-lg border border-[var(--border)]
-      bg-surface2/50 hover:bg-surface2 text-text font-medium px-4 py-2.5 text-sm transition;
+      bg-surface2/50 hover:bg-surface3 text-text font-medium px-3 py-2 text-sm transition;
+  }
+
+  .badge {
+    @apply inline-flex items-center rounded px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide whitespace-nowrap;
+  }
+
+  .badge-critical {
+    @apply badge bg-critical/15 text-critical;
+  }
+
+  .badge-high {
+    @apply badge bg-warning/15 text-warning;
+  }
+
+  .badge-medium {
+    @apply badge bg-primary/15 text-primary;
+  }
+
+  .badge-low {
+    @apply badge bg-surface3 text-muted;
+  }
+
+  .badge-success {
+    @apply badge bg-success/15 text-success;
+  }
+
+  .nav-item {
+    @apply flex items-center gap-3 px-3 py-2.5 rounded-lg text-sm font-medium transition min-h-[44px];
+  }
+
+  .nav-item-active {
+    @apply nav-item bg-primary/15 text-text;
+  }
+
+  .nav-item-idle {
+    @apply nav-item text-muted hover:text-text hover:bg-surface2;
+  }
+
+  .data-table {
+    @apply w-full text-sm min-w-[640px];
+  }
+
+  .data-table th {
+    @apply text-left text-[11px] uppercase tracking-wider text-muted font-medium px-3 sm:px-4 py-3 border-b border-[var(--border)] whitespace-nowrap;
+  }
+
+  .data-table td {
+    @apply px-3 sm:px-4 py-3 border-b border-[var(--border)] align-middle;
+  }
+
+  .table-scroll {
+    @apply overflow-x-auto -mx-4 sm:mx-0;
+  }
+
+  .template-card {
+    @apply panel p-4 sm:p-5 flex flex-col gap-3 h-full;
+  }
+
+  .shell-header {
+    @apply shrink-0 border-b border-[var(--border)] bg-surface flex items-center px-4 sm:px-6 lg:px-8;
+  }
+
+  .sidebar-rail {
+    @apply w-64 shrink-0 border-r border-[var(--border)] bg-surface flex flex-col;
+  }
+
+  .filter-grid {
+    @apply grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3;
+  }
+
+  .safe-bottom {
+    padding-bottom: env(safe-area-inset-bottom, 0px);
   }
 }

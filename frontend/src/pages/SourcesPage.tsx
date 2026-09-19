@@ -1,6 +1,7 @@
 import { useQuery } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import PageHeader from "../components/PageHeader";
 import TableFilters from "../components/TableFilters";
 import { countryFlag } from "../lib/country";
 import { api } from "../lib/api";
@@ -32,11 +33,8 @@ export default function SourcesPage() {
   });
 
   return (
-    <div className="space-y-6">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Source IPs</h1>
-        <p className="text-muted text-sm mt-1">Click an IP to open the investigation view.</p>
-      </div>
+    <>
+      <PageHeader title="Source IPs" description="Click an IP to open the investigation view with timeline, intel, and risk context." />
 
       <TableFilters
         hours={hours}
@@ -59,39 +57,39 @@ export default function SourcesPage() {
           <div className="px-4 py-3 border-b border-[var(--border)] text-xs text-muted">
             {data.total} source{data.total === 1 ? "" : "s"}
           </div>
-          <div className="overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead className="text-xs uppercase text-muted bg-surface2/50">
+          <div className="table-scroll">
+            <table className="data-table">
+              <thead>
                 <tr>
-                  <th className="text-left px-4 py-3 font-medium">IP</th>
-                  <th className="text-left px-4 py-3 font-medium">Risk</th>
-                  <th className="text-left px-4 py-3 font-medium">Attempts</th>
-                  <th className="text-left px-4 py-3 font-medium">Country</th>
-                  <th className="text-left px-4 py-3 font-medium">ASN / ISP</th>
-                  <th className="text-left px-4 py-3 font-medium">Services</th>
-                  <th className="text-left px-4 py-3 font-medium">Last seen</th>
+                  <th>IP</th>
+                  <th>Risk</th>
+                  <th>Attempts</th>
+                  <th>Country</th>
+                  <th>ASN / ISP</th>
+                  <th>Services</th>
+                  <th>Last seen</th>
                 </tr>
               </thead>
               <tbody>
                 {data.items.length === 0 ? (
                   <tr>
-                    <td colSpan={7} className="px-4 py-10 text-center text-muted">
+                    <td colSpan={7} className="py-10 text-center text-muted">
                       No sources match filters.
                     </td>
                   </tr>
                 ) : (
                   data.items.map((s) => (
-                    <tr key={s.source_ip} className="border-t border-[var(--border)] hover:bg-surface2/30">
-                      <td className="px-4 py-3 font-mono">
+                    <tr key={s.source_ip} className="hover:bg-surface2/40">
+                      <td className="font-mono text-xs">
                         <Link to={`/app/sources/${encodeURIComponent(s.source_ip)}`} className="text-primary hover:underline">
                           {s.source_ip}
                         </Link>
                       </td>
-                      <td className={`px-4 py-3 capitalize font-medium ${riskClass(s.max_risk_level)}`}>
+                      <td className={`capitalize font-medium text-xs ${riskClass(s.max_risk_level)}`}>
                         {s.max_risk_level} ({s.max_risk_score})
                       </td>
-                      <td className="px-4 py-3 tabular-nums">{s.total_attempts}</td>
-                      <td className="px-4 py-3 text-xs">
+                      <td className="tabular-nums">{s.total_attempts}</td>
+                      <td className="text-xs">
                         {s.country_name ? (
                           <>
                             {countryFlag(s.country_code)} {s.country_name}
@@ -100,11 +98,11 @@ export default function SourcesPage() {
                           <span className="text-muted">—</span>
                         )}
                       </td>
-                      <td className="px-4 py-3 text-xs text-muted max-w-[140px] truncate" title={s.isp || ""}>
+                      <td className="text-xs text-muted max-w-[140px] truncate" title={s.isp || ""}>
                         {s.asn || s.isp || "—"}
                       </td>
-                      <td className="px-4 py-3">{(s.services || []).join(", ") || "—"}</td>
-                      <td className="px-4 py-3 text-muted text-xs">{new Date(s.last_seen).toLocaleString()}</td>
+                      <td className="text-xs">{(s.services || []).join(", ") || "—"}</td>
+                      <td className="text-muted text-xs whitespace-nowrap">{new Date(s.last_seen).toLocaleString()}</td>
                     </tr>
                   ))
                 )}
@@ -113,6 +111,6 @@ export default function SourcesPage() {
           </div>
         </div>
       )}
-    </div>
+    </>
   );
 }

@@ -47,3 +47,4 @@ class WazuhSaveRequest(WazuhTestRequest):
 class WazuhSaveResponse(BaseModel):
     id: str
     message: str
+    initial_ingest: dict | None = None

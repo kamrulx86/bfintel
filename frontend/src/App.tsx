@@ -31,12 +31,8 @@ function ApiError({ onRetry, hint }: { onRetry: () => void; hint?: string }) {
       <div className="panel p-8 max-w-md text-center">
         <p className="text-critical font-medium">Cannot reach BFIntel API</p>
         <p className="text-muted text-sm mt-2">
-          Use{" "}
-          <a href="http://192.168.122.186:8888" className="text-primary hover:underline font-mono">
-            http://192.168.122.186:8888
-          </a>{" "}
-          (nginx). Port <span className="font-mono">5173</span> is UI-only and will not proxy{" "}
-          <span className="font-mono">/api</span> correctly.
+          Open BFIntel through the <span className="font-mono">nginx</span> entrypoint (same host/port you use in the browser).
+          The Vite dev port <span className="font-mono">5173</span> does not proxy <span className="font-mono">/api</span> unless configured.
         </p>
         {hint && <p className="text-xs text-warning mt-3">{hint}</p>}
         <button type="button" onClick={onRetry} className="btn-primary mt-5">

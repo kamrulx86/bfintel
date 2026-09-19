@@ -25,18 +25,30 @@ export default function GlobalSearch() {
   }, []);
 
   return (
-    <div ref={wrapRef} className="relative flex-1 max-w-md">
-      <input
-        type="search"
-        value={q}
-        onChange={(e) => {
-          setQ(e.target.value);
-          setOpen(true);
-        }}
-        onFocus={() => setOpen(true)}
-        placeholder="Search IP, hostname, username…"
-        className="input-field py-2 text-xs w-full"
-      />
+    <div ref={wrapRef} className="relative flex-1 max-w-lg">
+      <div className="relative">
+        <svg
+          className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted pointer-events-none"
+          viewBox="0 0 24 24"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.75"
+        >
+          <circle cx="11" cy="11" r="7" />
+          <path d="M20 20l-3-3" />
+        </svg>
+        <input
+          type="search"
+          value={q}
+          onChange={(e) => {
+            setQ(e.target.value);
+            setOpen(true);
+          }}
+          onFocus={() => setOpen(true)}
+          placeholder="Search IP, hostname, username…"
+          className="input-field py-2.5 text-xs w-full pl-10"
+        />
+      </div>
       {open && debounced.length >= 2 && data && data.results.length > 0 && (
         <div className="absolute z-50 mt-1 w-full panel py-1 max-h-72 overflow-auto shadow-lg">
           {data.results.map((r) => (

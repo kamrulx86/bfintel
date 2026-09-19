@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import PageHeader from "../components/PageHeader";
 import { api, AbuseReportOut } from "../lib/api";
 
 function mailtoLink(report: AbuseReportOut) {
@@ -56,12 +57,10 @@ export default function AbuseReportsPage() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Abuse reports</h1>
-        <p className="text-muted text-sm mt-1">
-          Draft ISP abuse emails from investigation evidence. Send via your mail client, then mark as submitted.
-        </p>
-      </div>
+      <PageHeader
+        title="Abuse reports"
+        description="Draft ISP abuse emails from investigation evidence. Send via your mail client, then mark as submitted."
+      />
 
       <div className="grid xl:grid-cols-2 gap-6">
         <div className="panel overflow-hidden">

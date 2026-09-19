@@ -7,8 +7,10 @@ from app.api.deps import CurrentUser, DbSession
 from app.models.automation_rule import AutomationRule
 from app.models.rule_execution import RuleExecution
 from app.models.user import Role
-from app.schemas.automation import RuleCreate, RuleExecutionOut, RuleOut
+from app.models.notification_channel import NotificationChannel
+from app.schemas.automation import RuleCreate, RuleExecutionOut, RuleFromTemplateCreate, RuleOut, RuleTemplateOut
 from app.services.audit import write_audit
+from app.services.rule_templates import RULE_TEMPLATES, get_template
 from app.services.rules_engine import evaluate_rules
 
 router = APIRouter(prefix="/rules", tags=["rules"])
@@ -17,6 +19,57 @@ router = APIRouter(prefix="/rules", tags=["rules"])
 def _require_admin(user: CurrentUser) -> None:
     if user.role != Role.admin.value:
         raise HTTPException(status_code=403, detail="Admin only")
+
+
+@router.get("/templates", response_model=list[RuleTemplateOut])
+def list_rule_templates(_user: CurrentUser) -> list[RuleTemplateOut]:
+    return [RuleTemplateOut.model_validate(t) for t in RULE_TEMPLATES]
+
+
+@router.post("/from-template", response_model=RuleOut)
+def create_rule_from_template(
+    db: DbSession,
+    user: CurrentUser,
+    body: RuleFromTemplateCreate,
+) -> RuleOut:
+    _require_admin(user)
+    tpl = get_template(body.template_id)
+    if not tpl:
+        raise HTTPException(status_code=404, detail="Unknown rule template")
+
+    actions: list[dict] = []
+    if body.channel_id:
+        channel = db.scalar(
+            select(NotificationChannel).where(
+                NotificationChannel.id == body.channel_id,
+                NotificationChannel.organization_id == user.organization_id,
+            )
+        )
+        if not channel:
+            raise HTTPException(status_code=404, detail="Notification channel not found")
+        actions = [{"type": "notify", "channel_id": str(channel.id)}]
+
+    name = (body.name_override or tpl["name"]).strip()
+    row = AutomationRule(
+        organization_id=user.organization_id,
+        name=name,
+        enabled=body.enabled,
+        conditions=tpl["conditions"],
+        actions=actions,
+        cooldown_minutes=tpl["cooldown_minutes"],
+    )
+    db.add(row)
+    write_audit(
+        db,
+        user_id=user.id,
+        organization_id=user.organization_id,
+        action="rule.create_from_template",
+        target=name,
+        metadata={"template_id": body.template_id, "channel_id": str(body.channel_id) if body.channel_id else None},
+    )
+    db.commit()
+    db.refresh(row)
+    return RuleOut.model_validate(row)
 
 
 @router.get("", response_model=list[RuleOut])

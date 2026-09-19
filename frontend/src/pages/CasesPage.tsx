@@ -1,6 +1,7 @@
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { Link } from "react-router-dom";
 import { useState } from "react";
+import PageHeader from "../components/PageHeader";
 import { api, CaseOut } from "../lib/api";
 
 const statuses = ["new", "investigating", "contained", "resolved", "closed"];
@@ -68,10 +69,7 @@ export default function CasesPage() {
 
   return (
     <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Cases</h1>
-        <p className="text-muted text-sm mt-1">Track investigations from brute-force signals to resolution.</p>
-      </div>
+      <PageHeader title="Cases" description="Track investigations from brute-force signals to resolution." />
 
       <div className="panel p-5 max-w-xl space-y-3">
         <h2 className="text-sm font-semibold">Open case</h2>

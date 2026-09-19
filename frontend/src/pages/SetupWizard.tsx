@@ -27,7 +27,7 @@ export default function SetupWizard({
     password: "",
   });
   const [wazuh, setWazuh] = useState({
-    api_url: "https://192.168.122.186:55000",
+    api_url: "https://your-wazuh-manager:55000",
     api_username: "",
     api_password: "",
     indexer_url: "",
@@ -61,7 +61,19 @@ export default function SetupWizard({
     e.preventDefault();
     setError(null);
     try {
-      await api.saveWazuh({ ...wazuh, name: "Primary" });
+      const saved = (await api.saveWazuh({ ...wazuh, name: "Primary" })) as {
+        initial_ingest?: { normalized?: number; error?: string };
+      };
+      const imported = saved.initial_ingest?.normalized ?? 0;
+      if (saved.initial_ingest?.error === "file_missing") {
+        setError(
+          "Wazuh connected, but alerts.json is not mounted on the server. Check WAZUH_ALERTS_HOST_DIR in .env.",
+        );
+        return;
+      }
+      if (imported > 0) {
+        window.alert(`Imported ${imported} authentication events from Wazuh. Sign in to review them.`);
+      }
       clearToken();
       onComplete();
       navigate("/login", { replace: true });

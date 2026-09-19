@@ -1,6 +1,7 @@
 import type { ReactNode } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import { useState } from "react";
+import PageHeader from "../components/PageHeader";
 import { api } from "../lib/api";
 
 type Tab = "watchlist" | "allowlist" | "blocklist" | "audit";
@@ -70,13 +71,10 @@ export default function SettingsPage() {
   ];
 
   return (
-    <div className="space-y-8">
-      <div>
-        <h1 className="text-2xl font-semibold tracking-tight">Settings</h1>
-        <p className="text-muted text-sm mt-1">SOC lists and audit trail. Allowlisted IPs skip automation rule notifications.</p>
-      </div>
+    <>
+      <PageHeader title="Settings" description="SOC lists and audit trail. Allowlisted IPs skip automation rule notifications." />
 
-      <div className="flex flex-wrap gap-2">
+      <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1">
         {tabs.map((t) => (
           <button
             key={t.id}
@@ -198,14 +196,14 @@ export default function SettingsPage() {
           </table>
         </div>
       )}
-    </div>
+    </>
   );
 }
 
 function ListTable({ headers, rows }: { headers: string[]; rows: (string | ReactNode)[][] }) {
   return (
-    <div className="panel overflow-hidden">
-      <table className="w-full text-sm">
+    <div className="panel overflow-hidden table-scroll">
+      <table className="data-table">
         <thead className="text-xs uppercase text-muted bg-surface2/50">
           <tr>
             {headers.map((h) => (

@@ -116,6 +116,9 @@ export const api = {
   testNotificationChannel: (id: string) =>
     request<{ status: string }>(`/api/notifications/channels/${id}/test`, { method: "POST" }),
   rules: () => request<AutomationRuleOut[]>("/api/rules"),
+  ruleTemplates: () => request<RuleTemplateOut[]>("/api/rules/templates"),
+  createRuleFromTemplate: (body: { template_id: string; channel_id?: string; name_override?: string; enabled?: boolean }) =>
+    request<AutomationRuleOut>("/api/rules/from-template", { method: "POST", body: JSON.stringify(body) }),
   createRule: (body: object) => request<AutomationRuleOut>("/api/rules", { method: "POST", body: JSON.stringify(body) }),
   toggleRule: (id: string) => request<AutomationRuleOut>(`/api/rules/${id}/toggle`, { method: "PATCH" }),
   ruleExecutions: () => request<RuleExecutionOut[]>("/api/rules/executions"),
@@ -167,6 +170,18 @@ export type NotificationChannelOut = {
   channel_type: string;
   is_active: boolean;
   created_at: string;
+};
+
+export type RuleTemplateOut = {
+  id: string;
+  name: string;
+  description: string;
+  category: string;
+  severity: string;
+  cooldown_minutes: number;
+  conditions_summary: string;
+  conditions: Record<string, unknown>;
+  note?: string | null;
 };
 
 export type AutomationRuleOut = {

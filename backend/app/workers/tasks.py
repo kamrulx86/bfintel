@@ -4,9 +4,25 @@ from app.core.database import SessionLocal
 from app.models.wazuh_connection import WazuhConnection
 from app.services.enrichment import enrich_pending_ips
 from app.services.rules_engine import evaluate_rules
-from app.services.ingest_alerts import ingest_alerts_file
+from app.services.ingest_alerts import ingest_alerts_file, ingest_initial_wazuh_logs
 from app.workers.celery_app import celery_app
 from sqlalchemy import select
+
+
+@celery_app.task(name="bfintel.initial_wazuh_ingest")
+def initial_wazuh_ingest(organization_id: str) -> dict:
+    """Background backfill after setup (completes large alert files + enrichment)."""
+    db = SessionLocal()
+    try:
+        org_id = UUID(organization_id)
+        stats = ingest_initial_wazuh_logs(db, org_id)
+        db.commit()
+        return {"status": "ok", **{k: v for k, v in stats.items() if k != "enrichment"}, "enrichment": stats.get("enrichment")}
+    except Exception as exc:  # noqa: BLE001
+        db.rollback()
+        return {"status": "error", "detail": str(exc)}
+    finally:
+        db.close()
 
 
 @celery_app.task(name="bfintel.poll_wazuh_alerts")

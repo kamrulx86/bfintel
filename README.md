@@ -53,11 +53,12 @@ docker compose up -d --build
 
 Open **http://localhost:8080** — complete setup wizard.
 
-## Dev on Wazuh lab (`192.168.122.186`)
+## Wazuh co-location
 
-- Wazuh API: `https://192.168.122.186:55000`
-- Use dashboard API user (e.g. `wazuh-wui`) — **never commit credentials**
-- Disable TLS verify in wizard if using default Wazuh certificates
+- Point the setup wizard at your manager API (e.g. `https://<wazuh-host>:55000`).
+- Use the dashboard API user (e.g. `wazuh-wui`) — **never commit credentials**.
+- Disable TLS verify in the wizard if using default Wazuh certificates.
+- Mount `/var/ossec/logs/alerts` when BFIntel runs on the manager host — see [DEPLOYMENT.md](docs/DEPLOYMENT.md).
 
 ## Docs
 
